@@ -44,6 +44,9 @@ public class Cartao {
 	@Column(name = "saldo", nullable = false)
 	private float saldo;
 	
+	@Column(name = "flg_ativo", nullable = false)
+	private Boolean isAtivo;
+	
 	@ManyToOne(cascade = CascadeType.MERGE,fetch =  FetchType.LAZY)  
     @JoinColumn(name="id_pessoa", nullable = false)
 	private Pessoa pessoa;
