@@ -1,6 +1,6 @@
 package com.api.conta.dto;
 
-import java.sql.Date;
+import java.util.Date;
 
 import com.api.conta.enums.TipoMovimentacao;
 
@@ -16,7 +16,6 @@ import lombok.Setter;
 public class ContaDTO {
 
 	private int idConta;
-	private int idPessoa;
 	private int idCartao;
 	private int valor;
 	private TipoMovimentacao tipoMovimentacao;

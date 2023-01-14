@@ -3,16 +3,18 @@ package com.api.conta.services.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.api.conta.dto.ContaDTO;
-import com.api.conta.entities.Cartao;
 import com.api.conta.entities.Conta;
 import com.api.conta.repositories.ContaRepository;
 import com.api.conta.services.ContaServices;
 
+@Service
 public class ContaServicesImpl implements ContaServices{
 
 	@Autowired
@@ -20,25 +22,23 @@ public class ContaServicesImpl implements ContaServices{
 	
 	private String msgErro;
 	
-	//private ModelMapper mapper;
+	private ModelMapper mapper = new ModelMapper();
 	
 	private static final Logger log = LoggerFactory.getLogger(ContaServicesImpl.class);
 	
 	@Override
 	public List<ContaDTO> findAll() throws Exception {
-		log.info("Buscando todas os registros de cartaos.");
-		List<Cartao> cartaos = new ArrayList<Cartao>();
-		List<ContaDTO> cartaosRetorno = new ArrayList<ContaDTO>();
+		log.info("Buscando todas os registros de contas.");
+		List<Conta> contas = new ArrayList<Conta>();
+		List<ContaDTO> contasRetorno = new ArrayList<ContaDTO>();
 		
 		try {
-			//cartaos = this.repository.findAll().stream().map(cartao-> mapper.mapModels(cartao, ContaDTO.class));
-			for(Cartao cartao: cartaos) {
-			//	cartaosRetorno.add(mapper.ma);
-			}
+			contas = this.repository.findAll();
+			contas.stream().forEach(conta->contasRetorno.add(mapper.map(conta, ContaDTO.class)));
 			log.info("Busca realizada com sucesso");
-			return cartaosRetorno;
+			return contasRetorno;
 		}catch (Exception e) {
-			msgErro = "Erro ao buscar cartaos. "+e.getMessage();
+			msgErro = "Erro ao buscar contas. "+e.getMessage();
 			log.info(msgErro);
 			throw new Exception(msgErro);
 		}
@@ -46,35 +46,36 @@ public class ContaServicesImpl implements ContaServices{
 
 	@Override
 	public ContaDTO findById(Integer id_conta) throws Exception {
-		log.info("Buscando cartao.");
+		log.info("Buscando conta.");
 		Conta conta = new Conta();
 		try {
 			conta = this.repository.findByIdConta(id_conta);
 			if(conta == null) {
 				throw new Exception("Sem resultados.");
 			}
-			log.info("Cartao encontrado.");
-			return null;// new ContaDTO(cartao);
+			log.info("Conta encontrado.");
+			return mapper.map(conta, ContaDTO.class);
 		}catch (Exception e) {
-			msgErro = "Erro ao buscar cartao. "+e.getMessage();
+			msgErro = "Erro ao buscar conta. "+e.getMessage();
 			log.info(msgErro);
 			throw new Exception(msgErro);
 		}
 	}
 
 	@Override
-	public ContaDTO save(ContaDTO contaDTO) throws Exception {
-		if(contaDTO.equals(null)){
+	public List<ContaDTO> save(List<ContaDTO> contasDTO) throws Exception {
+		if(contasDTO.isEmpty()){
 			throw new Exception("Pesquisa em branco. ");
 		}
-		log.info("Salvando cartao");
-		Cartao cartao = new Cartao();
+		log.info("Salvando conta");
+		final List<Conta> contas = new ArrayList<>();
+		List<ContaDTO>contaRetorno = new ArrayList<ContaDTO>();
 		try {
-			//cartao = this.repository.save(contaDTO.toEntity());
-			//return new ContaDTO(cartao);
-			return null;
+			contasDTO.forEach(conta->contas.add(mapper.map(conta, Conta.class)));
+			this.repository.saveAll(contas).forEach(conta->contaRetorno.add(mapper.map(conta, ContaDTO.class)));
+			return contaRetorno;
 		}catch (Exception e) {
-			msgErro = "Erro ao salvar cartao. "+e.getMessage();
+			msgErro = "Erro ao salvar conta. "+e.getMessage();
 			log.info(msgErro);
 			throw new Exception(msgErro);
 		}
@@ -83,13 +84,13 @@ public class ContaServicesImpl implements ContaServices{
 	@Override
 	public void delete(Integer id_conta) throws Exception {
 		Conta conta = new Conta();
-		log.info("Deletando cartao...");
+		log.info("Deletando conta...");
 		
 		try{
 			conta = this.repository.findByIdConta(id_conta);
 			this.repository.delete(conta);
 		}catch (Exception e) {;
-			msgErro = "Erro cartao não pode ser deletado. "+e.getMessage();
+			msgErro = "Erro conta não pode ser deletado. "+e.getMessage();
 			log.info(msgErro);
 			throw new Exception(msgErro);
 		}

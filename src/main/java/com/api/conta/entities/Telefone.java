@@ -3,6 +3,7 @@ package com.api.conta.entities;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,14 +22,14 @@ public class Telefone {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_telefone", nullable = false)
+	@Column(name = "id_telefone", nullable = true)
 	private Integer idTelefone;
 	
 	@Column(name = "num_telefone", nullable = false)
 	private String numero;
 	
 	
-	@ManyToOne(cascade = CascadeType.ALL)  
+	@ManyToOne(cascade = CascadeType.ALL, fetch =  FetchType.LAZY)  
     @JoinColumn(name="id_pessoa", nullable = false)
 	private Pessoa pessoa;
 }

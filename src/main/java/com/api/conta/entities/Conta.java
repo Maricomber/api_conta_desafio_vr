@@ -1,6 +1,6 @@
 package com.api.conta.entities;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,7 +28,7 @@ public class Conta {
 	@Column(name = "id_conta")
 	private int idConta;
 	
-	@ManyToOne(cascade = CascadeType.ALL)  
+	@ManyToOne(cascade = CascadeType.MERGE)  
     @JoinColumn(name="id_cartao", nullable = false)
 	private Cartao cartao;
 	

@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.api.conta.dto.ContaDTO;
 import com.api.conta.response.Response;
@@ -22,6 +24,8 @@ import com.api.conta.services.ContaServices;
 
 import io.swagger.annotations.*;
 
+@RestController
+@RequestMapping(path = {"/api/conta"})
 public class ContaController {
 	
 	@Autowired
@@ -96,9 +100,9 @@ public class ContaController {
 	    @ApiResponse(code = 500, message = "Foi gerada uma exceção"),
 	})
 	@PostMapping
-	public @ResponseBody ResponseEntity<Response<ContaDTO>> saveUsuario(@RequestBody ContaDTO contaDTO) {
+	public @ResponseBody ResponseEntity<Response<List<ContaDTO>>> saveUsuario(@RequestBody List<ContaDTO> contaDTO) {
 		
-		Response<ContaDTO> response = new Response<ContaDTO>();
+		Response<List<ContaDTO>> response = new Response<List<ContaDTO>>();
 		List<String>erros = new ArrayList<String>();
 		
 		try {
@@ -125,10 +129,10 @@ public class ContaController {
 	    @ApiResponse(code = 500, message = "Foi gerada uma exceção"),
 	})
 	@PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes =  MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<Response<ContaDTO>> update(@RequestBody ContaDTO contaDTO){
+	public @ResponseBody ResponseEntity<Response<List<ContaDTO>>> update(@RequestBody List<ContaDTO> contaDTO){
 		
 		List<String>erros = new ArrayList<String>();
-		Response<ContaDTO>response = new Response<ContaDTO>();
+		Response<List<ContaDTO>>response = new Response<List<ContaDTO>>();
 		
 		try {
 			contaDTO = this.service.save(contaDTO);
@@ -151,9 +155,9 @@ public class ContaController {
 	    @ApiResponse(code = 500, message = "Foi gerada uma exceção"),
 	})
 	@DeleteMapping("/{id}")
-	public @ResponseBody ResponseEntity<Response<ContaDTO>> deleteUsuario(@PathVariable Integer id) {
+	public @ResponseBody ResponseEntity<Response<String>> delete(@PathVariable Integer id) {
 		
-		Response<ContaDTO> response = new Response<ContaDTO>();
+		Response<String> response = new Response<String>();
 		List<String>erros = new ArrayList<String>();
 		
 		try {
@@ -161,6 +165,7 @@ public class ContaController {
 				throw new Exception("Campos em branco. ");
 			}
 			this.service.delete(id);
+			response.setData("Conta deletada com sucesso");
 		}catch (Exception e) {
 			erros.add(e.getMessage());
 			response.setErrors(erros);
