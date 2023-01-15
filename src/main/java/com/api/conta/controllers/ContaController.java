@@ -1,5 +1,6 @@
 package com.api.conta.controllers;
 
+import java.sql.SQLDataException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,14 +41,14 @@ public class ContaController {
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody ResponseEntity<Response<List<ContaDTO>>> findContas(HttpServletRequest request) {
 		
-		Response<List<ContaDTO>> response = new Response<List<ContaDTO>>();
-		List<String>erros = new ArrayList<String>();
+		Response<List<ContaDTO>> response = new Response<>();
+		List<String>erros = new ArrayList<>();
 		
 		try{
 			List<ContaDTO>contaDTO = this.service.findAll();
 			
 			if(contaDTO.isEmpty()) {
-				throw new Exception("Registro de contas não encontrado");
+				throw new SQLDataException("Registro de contas não encontrado");
 			}
 			response.setData(contaDTO);
 			return ResponseEntity.ok(response);
@@ -68,20 +69,16 @@ public class ContaController {
 	@GetMapping(path = {"/{id}"},produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody ResponseEntity<Response<ContaDTO>> findById(@PathVariable Integer id){
 		
-		List<String>erros = new ArrayList<String>();
-		Response<ContaDTO>response = new Response<ContaDTO>();
+		List<String>erros = new ArrayList<>();
+		Response<ContaDTO>response = new Response<>();
 		ContaDTO contaDTO;
 		
 		try {
 			
-			if(id == null) {
-				throw new Exception("Campos em branco");
-			}
-			
 			contaDTO= this.service.findById(id);
 			
-			if(contaDTO.equals(null)) {
-				throw new Exception("Usuario não encontrado. ");
+			if(contaDTO == null) {
+				throw new SQLDataException("Usuario não encontrado. ");
 			}
 			response.setData(contaDTO);
 			return ResponseEntity.ok(response);
@@ -102,14 +99,11 @@ public class ContaController {
 	@PostMapping
 	public @ResponseBody ResponseEntity<Response<List<ContaDTO>>> saveUsuario(@RequestBody List<ContaDTO> contaDTO) {
 		
-		Response<List<ContaDTO>> response = new Response<List<ContaDTO>>();
-		List<String>erros = new ArrayList<String>();
+		Response<List<ContaDTO>> response = new Response<>();
+		List<String>erros = new ArrayList<>();
 		
 		try {
-
-			if(contaDTO == null) {
-				throw new Exception("Campos vazios. ");
-			}
+			
 			contaDTO = this.service.save(contaDTO);
 			response.setData(contaDTO);
 			return ResponseEntity.ok(response);
@@ -131,12 +125,12 @@ public class ContaController {
 	@PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes =  MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody ResponseEntity<Response<List<ContaDTO>>> update(@RequestBody List<ContaDTO> contaDTO){
 		
-		List<String>erros = new ArrayList<String>();
-		Response<List<ContaDTO>>response = new Response<List<ContaDTO>>();
+		List<String>erros = new ArrayList<>();
+		Response<List<ContaDTO>>response = new Response<>();
 		
 		try {
 			contaDTO = this.service.save(contaDTO);
-			if(contaDTO.equals(null)) {
+			if(contaDTO == null) {
 				return ResponseEntity.badRequest().body(response);
 			}
 		response.setData(contaDTO);
@@ -157,13 +151,10 @@ public class ContaController {
 	@DeleteMapping("/{id}")
 	public @ResponseBody ResponseEntity<Response<String>> delete(@PathVariable Integer id) {
 		
-		Response<String> response = new Response<String>();
-		List<String>erros = new ArrayList<String>();
+		Response<String> response = new Response<>();
+		List<String>erros = new ArrayList<>();
 		
 		try {
-			if(id == null) {
-				throw new Exception("Campos em branco. ");
-			}
 			this.service.delete(id);
 			response.setData("Conta deletada com sucesso");
 		}catch (Exception e) {

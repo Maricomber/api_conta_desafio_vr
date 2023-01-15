@@ -7,6 +7,6 @@ import com.api.conta.entities.Conta;
 
 @Repository
 public interface ContaRepository  extends JpaRepository<Conta, Integer>{
-	Conta findByIdConta(Integer id_cartao);
+	Conta findByIdConta(Integer idConta);
 
 }
