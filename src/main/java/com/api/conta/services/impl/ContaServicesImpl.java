@@ -25,8 +25,7 @@ public class ContaServicesImpl implements ContaServices{
 	@Autowired
 	ContaRepository repository;
 	
-	@Autowired
-	RegraNegocio regraNegocio;
+	//RegraNegocio regraNegocio;
 	
 	private String msgErro;
 	
@@ -105,31 +104,31 @@ public class ContaServicesImpl implements ContaServices{
 		}
 	}
 	
-	private void aplicarRegra(List<ContaDTO> contas){
-		List<CartaoDTO>cartaoRetorno = new ArrayList<>();
-		
-		contas.stream().forEach(conta-> {
-			try {
-				cartaoRetorno.add(regraNegocio.aplicarRegra(conta.getValor(), buscaCartao(conta.getIdCartao())));
-			} catch (Exception e) {
-				msgErro = "Erro conta não pode ser deletado. "+e.getMessage();
-				log.info(msgErro);
-			}
-		});
-		
-		atualizaCartao(cartaoRetorno);
-		
-	}
-	
-	private CartaoDTO buscaCartao(Integer idCartao) {
-		return null;
-		//TODO: GET CARTAO BY ID
-	}
-	
-	private CartaoDTO atualizaCartao(List<CartaoDTO> cartoes) {
-		//TODO: PUT CARTAO
-		return null;
-	}
+//	private void aplicarRegra(List<ContaDTO> contas){
+//		List<CartaoDTO>cartaoRetorno = new ArrayList<>();
+//		
+//		contas.stream().forEach(conta-> {
+//			try {
+//				cartaoRetorno.add(regraNegocio.aplicarRegra(conta.getValor(), buscaCartao(conta.getIdCartao())));
+//			} catch (Exception e) {
+//				msgErro = "Erro conta não pode ser deletado. "+e.getMessage();
+//				log.info(msgErro);
+//			}
+//		});
+//		
+//		atualizaCartao(cartaoRetorno);
+//		
+//	}
+//	
+//	private CartaoDTO buscaCartao(Integer idCartao) {
+//		return null;
+//		//TODO: GET CARTAO BY ID
+//	}
+//	
+//	private CartaoDTO atualizaCartao(List<CartaoDTO> cartoes) {
+//		//TODO: PUT CARTAO
+//		return null;
+//	}
 	
 	
 }
