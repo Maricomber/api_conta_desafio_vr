@@ -11,12 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.api.conta.dto.CartaoDTO;
 import com.api.conta.dto.ContaDTO;
 import com.api.conta.entities.Conta;
+import com.api.conta.enums.TipoMovimentacao;
 import com.api.conta.repositories.ContaRepository;
+import com.api.conta.response.Response;
 import com.api.conta.rn.RegraNegocio;
+import com.api.conta.rn.impl.RegraNegocioEntrada;
+import com.api.conta.rn.impl.RegraNegocioSaida;
 import com.api.conta.services.ContaServices;
 
 @Service
@@ -25,12 +30,14 @@ public class ContaServicesImpl implements ContaServices{
 	@Autowired
 	ContaRepository repository;
 	
-	//RegraNegocio regraNegocio;
+	RegraNegocio regraNegocio;
 	
 	private String msgErro;
 	
 	private ModelMapper mapper = new ModelMapper();
 	
+    private static final String api_cadastro = "http://localhost:8081/api/cartao/";
+
 	private static final Logger log = LoggerFactory.getLogger(ContaServicesImpl.class);
 	
 	@Override
@@ -78,7 +85,7 @@ public class ContaServicesImpl implements ContaServices{
 		final List<Conta> contas = new ArrayList<>();
 		List<ContaDTO>contaRetorno = new ArrayList<>();
 		try {
-			//aplicarRegra(contasDTO);
+			aplicarRegra(contasDTO);
 			contasDTO.forEach(conta->contas.add(mapper.map(conta, Conta.class)));
 			this.repository.saveAll(contas).forEach(conta->contaRetorno.add(mapper.map(conta, ContaDTO.class)));
 			return contaRetorno;
@@ -103,32 +110,47 @@ public class ContaServicesImpl implements ContaServices{
 			throw new SQLException(msgErro);
 		}
 	}
+	  
+	  
+	private void aplicarRegra(List<ContaDTO> contas){
+		List<CartaoDTO>cartaoRetorno = new ArrayList<>();
+		
+		
+		contas.stream().forEach(conta-> {
+			try {
+				definirInterface(conta);
+				cartaoRetorno.add(regraNegocio.aplicarRegra(conta.getValor(), buscaCartao(conta.getIdCartao())));
+			} catch (Exception e) {
+				msgErro = "Erro não foi possível recuperar dados do cartão. "+e.getMessage();
+				log.info(msgErro+e.getMessage());
+			}
+		});
+		
+		atualizaCartao(cartaoRetorno);
+		
+	}
 	
-//	private void aplicarRegra(List<ContaDTO> contas){
-//		List<CartaoDTO>cartaoRetorno = new ArrayList<>();
-//		
-//		contas.stream().forEach(conta-> {
-//			try {
-//				cartaoRetorno.add(regraNegocio.aplicarRegra(conta.getValor(), buscaCartao(conta.getIdCartao())));
-//			} catch (Exception e) {
-//				msgErro = "Erro conta não pode ser deletado. "+e.getMessage();
-//				log.info(msgErro);
-//			}
-//		});
-//		
-//		atualizaCartao(cartaoRetorno);
-//		
-//	}
-//	
-//	private CartaoDTO buscaCartao(Integer idCartao) {
-//		return null;
-//		//TODO: GET CARTAO BY ID
-//	}
-//	
-//	private CartaoDTO atualizaCartao(List<CartaoDTO> cartoes) {
-//		//TODO: PUT CARTAO
-//		return null;
-//	}
+	private void definirInterface(ContaDTO conta) {
+		if(conta.getTipoMovimentacao().equals(TipoMovimentacao.ENTRADA)) {
+			regraNegocio = new RegraNegocioEntrada();
+		}
+		else {
+			regraNegocio = new RegraNegocioSaida();
+		}
+	}
+	private CartaoDTO buscaCartao(Integer idCartao) {
+		RestTemplate restTemplate = new RestTemplate();
+		 
+		Response<CartaoDTO> response = restTemplate.getForObject(api_cadastro+idCartao, Response.class);
+		if(response.getData() !=null) {
+			return mapper.map(response.getData(), CartaoDTO.class);
+		}
+		return null;
+	}
+	
+	private CartaoDTO atualizaCartao(List<CartaoDTO> cartoes) {
+		return null;
+	}
 	
 	
 }

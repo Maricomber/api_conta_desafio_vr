@@ -97,7 +97,7 @@ public class ContaController {
 	    @ApiResponse(code = 500, message = "Foi gerada uma exceção"),
 	})
 	@PostMapping
-	public @ResponseBody ResponseEntity<Response<List<ContaDTO>>> saveUsuario(@RequestBody List<ContaDTO> contaDTO) {
+	public @ResponseBody ResponseEntity<Response<List<ContaDTO>>> save(@RequestBody List<ContaDTO> contaDTO) {
 		
 		Response<List<ContaDTO>> response = new Response<>();
 		List<String>erros = new ArrayList<>();

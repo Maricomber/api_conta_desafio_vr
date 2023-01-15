@@ -1,5 +1,7 @@
 package com.api.conta.rn.impl;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
@@ -9,22 +11,22 @@ import com.api.conta.dto.CartaoDTO;
 import com.api.conta.enums.TipoCartao;
 
 @SpringBootTest
-public class RegraNegocioEntradaTest {
+class RegraNegocioEntradaTest {
 
 	private RegraNegocioEntrada createTestSubject() {
 		return new RegraNegocioEntrada();
 	}
 
 	@Test
-	public void testAplicarRegra() throws Exception {
+	void testAplicarRegra() throws Exception {
 		RegraNegocioEntrada testSubject;
-		CartaoDTO cartaoDTO = null;
 		float valor = 0;
 		CartaoDTO result;
 
 		// default test
 		testSubject = createTestSubject();
 		testSubject.aplicarRegra(valor, getCartao());
+		assertNotNull(testSubject);
 	}
 	
 	private CartaoDTO getCartao() {

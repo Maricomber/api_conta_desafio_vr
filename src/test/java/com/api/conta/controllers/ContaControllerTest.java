@@ -27,7 +27,7 @@ import com.api.conta.services.ContaServices;
 import com.api.conta.services.impl.ContaServicesImpl;
 
 @SpringBootTest
-public class ContaControllerTest {
+class ContaControllerTest {
 	@Mock
 	ContaServicesImpl service;
 	
@@ -35,7 +35,7 @@ public class ContaControllerTest {
 	List<ContaDTO> contaDTO;
 	
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		MockitoAnnotations.openMocks(this);
 	}
 	
@@ -47,7 +47,7 @@ public class ContaControllerTest {
 
 	
 	@Test
-	public void testFindContas() throws Exception {
+	void testFindContas() throws Exception {
 		ContaController testSubject;
 		HttpServletRequest request = null;
 		ResponseEntity<Response<List<ContaDTO>>> result;
@@ -61,7 +61,7 @@ public class ContaControllerTest {
 	}
 	
 	@Test()
-	public void testFindContasIsEmptyError() throws Exception {
+	void testFindContasIsEmptyError() throws Exception {
 		ContaController testSubject;
 		HttpServletRequest request = null;
 		ResponseEntity<Response<List<ContaDTO>>> result;
@@ -75,7 +75,7 @@ public class ContaControllerTest {
 	}
 
 	@Test
-	public void testFindById() throws Exception {
+	void testFindById() throws Exception {
 		ContaController testSubject;
 		Integer id = 0;
 		ResponseEntity<Response<ContaDTO>> result;
@@ -89,7 +89,7 @@ public class ContaControllerTest {
 	}
 	
 	@Test
-	public void testFindByIdError() throws Exception {
+	void testFindByIdError() throws Exception {
 		ContaController testSubject;
 		Integer id = 0;
 		ResponseEntity<Response<ContaDTO>> result;
@@ -103,30 +103,30 @@ public class ContaControllerTest {
 	}
 
 	@Test
-	public void testSaveUsuario() throws Exception {
+	void testSaveUsuario() throws Exception {
 		ContaController testSubject;
 		ResponseEntity<Response<List<ContaDTO>>> result;
 		
 		when(service.save(Mockito.any(List.class))).thenReturn(getContas());
 		testSubject = createTestSubject();
-		result = testSubject.saveUsuario(getContas());
+		result = testSubject.save(getContas());
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
 	
 	@Test
-	public void testSaveUsuarioError() throws Exception {
+	void testSaveUsuarioError() throws Exception {
 		ContaController testSubject;
 		ResponseEntity<Response<List<ContaDTO>>> result;
 	
 		when(service.save(Mockito.any(List.class))).thenReturn(new ArrayList<ContaDTO>());
 		
 		testSubject = createTestSubject();
-		result = testSubject.saveUsuario(getContas());
+		result = testSubject.save(getContas());
 		assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
 	}
 
 	@Test
-	public void testUpdate() throws Exception {
+	void testUpdate() throws Exception {
 		ContaController testSubject;
 		ResponseEntity<Response<List<ContaDTO>>> result;
 		
@@ -138,7 +138,7 @@ public class ContaControllerTest {
 	}
 
 	@Test
-	public void testUpdateError() throws Exception {
+	void testUpdateError() throws Exception {
 		ContaController testSubject;
 		ResponseEntity<Response<List<ContaDTO>>> result;
 	
@@ -150,7 +150,7 @@ public class ContaControllerTest {
 	}
 	
 	@Test
-	public void testDelete() throws Exception {
+	void testDelete() throws Exception {
 		ContaController testSubject;
 		Integer id = 0;
 		ResponseEntity<Response<String>> result;
@@ -162,7 +162,7 @@ public class ContaControllerTest {
 	}
 	
 	@Test
-	public void testDeleteError() throws Exception {
+	void testDeleteError() throws Exception {
 		ContaController testSubject;
 		Integer id = 0;
 		ResponseEntity<Response<String>> result;
@@ -173,7 +173,7 @@ public class ContaControllerTest {
 		assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
 	}
 	
-	public List<ContaDTO> getContas() {
+	List<ContaDTO> getContas() {
 		List<ContaDTO> contasDTO = new ArrayList<ContaDTO>();
 		ContaDTO contaDTO = new ContaDTO();
 		contaDTO.setDataOperacao(new Date());
