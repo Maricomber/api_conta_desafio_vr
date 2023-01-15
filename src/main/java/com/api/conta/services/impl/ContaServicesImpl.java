@@ -148,8 +148,9 @@ public class ContaServicesImpl implements ContaServices{
 		return null;
 	}
 	
-	private CartaoDTO atualizaCartao(List<CartaoDTO> cartoes) {
-		return null;
+	private void atualizaCartao(List<CartaoDTO> cartoes) {
+		RestTemplate restTemplate = new RestTemplate(); 
+		cartoes.stream().forEach(cartao -> restTemplate.postForEntity(api_cadastro, cartao, CartaoDTO.class));
 	}
 	
 	
