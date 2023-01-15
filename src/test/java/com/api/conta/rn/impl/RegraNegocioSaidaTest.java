@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.api.conta.dto.CartaoDTO;
+import com.api.conta.enums.TipoCartao;
 
 @SpringBootTest
 public class RegraNegocioSaidaTest {
@@ -34,6 +35,9 @@ public class RegraNegocioSaidaTest {
 		cartao.setIdPessoa(1);
 		cartao.setIsAtivo(true);
 		cartao.setSaldo(20);
+		cartao.setTipoCartao(TipoCartao.ALIMENTACAO);
+		cartao.setNumero("1234");
+		cartao.setDataVencimento(new Date());
 		return cartao;
 	}
 

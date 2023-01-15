@@ -88,6 +88,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.21</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.4.0</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
@@ -104,10 +110,28 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.junit.platform</groupId>
-		    <artifactId>junit-platform-launcher</artifactId>
-		    <version>1.4.2</version>
-		    <scope>test</scope>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+	        <groupId>org.junit.jupiter</groupId>
+	        <artifactId>junit-jupiter-api</artifactId>
+	        <version>5.0.0</version>
+	        <scope>test</scope>
+	    </dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-runner</artifactId>
+			<version>1.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<version>5.2.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -124,6 +148,23 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			     <artifactId>maven-surefire-plugin</artifactId>
+	            <version>2.19</version>
+	            <dependencies>
+	                <dependency>
+	                    <groupId>org.junit.platform</groupId>
+	                    <artifactId>junit-platform-surefire-provider</artifactId>
+	                    <version>1.0.0</version>
+	                </dependency>
+	                <dependency>
+	                    <groupId>org.junit.jupiter</groupId>
+	                    <artifactId>junit-jupiter-engine</artifactId>
+	                    <version>5.0.0</version>
+	                </dependency>
+	            </dependencies>
 			</plugin>
 		</plugins>
 	</build>

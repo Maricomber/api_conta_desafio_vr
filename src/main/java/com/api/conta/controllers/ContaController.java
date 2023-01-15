@@ -78,7 +78,7 @@ public class ContaController {
 			contaDTO= this.service.findById(id);
 			
 			if(contaDTO == null) {
-				throw new SQLDataException("Usuario não encontrado. ");
+				throw new SQLDataException("Conta não encontrado. ");
 			}
 			response.setData(contaDTO);
 			return ResponseEntity.ok(response);
@@ -105,6 +105,9 @@ public class ContaController {
 		try {
 			
 			contaDTO = this.service.save(contaDTO);
+			if(contaDTO.isEmpty()) {
+				throw new SQLDataException("Erro ao salvar conta");
+			}
 			response.setData(contaDTO);
 			return ResponseEntity.ok(response);
 			
@@ -130,8 +133,8 @@ public class ContaController {
 		
 		try {
 			contaDTO = this.service.save(contaDTO);
-			if(contaDTO == null) {
-				return ResponseEntity.badRequest().body(response);
+			if(contaDTO.isEmpty()) {
+				throw new SQLDataException("Erro ao salvar conta");
 			}
 		response.setData(contaDTO);
 		return ResponseEntity.ok(response);

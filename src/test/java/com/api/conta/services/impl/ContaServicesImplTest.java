@@ -2,6 +2,7 @@ package com.api.conta.services.impl;
 
 import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class ContaServicesImplTest {
 		testSubject = createTestSubject();
 		result = testSubject.findAll();
 	}
+	
 
 	@Test
 	public void testFindById() throws Exception {
