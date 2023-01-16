@@ -1,34 +1,31 @@
 package com.api.conta.services.impl;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.NoResultException;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.api.conta.dto.CartaoDTO;
 import com.api.conta.dto.ContaDTO;
-import com.api.conta.entities.Conta;
 import com.api.conta.enums.TipoMovimentacao;
-import com.api.conta.repositories.ContaRepository;
+import com.api.conta.producer.ContaProducer;
 import com.api.conta.response.Response;
 import com.api.conta.rn.RegraNegocio;
 import com.api.conta.rn.impl.RegraNegocioEntrada;
 import com.api.conta.rn.impl.RegraNegocioSaida;
 import com.api.conta.services.ContaServices;
 
+import net.minidev.json.JSONArray;
+
 @Service
 public class ContaServicesImpl implements ContaServices{
-
-	@Autowired
-	ContaRepository repository;
 	
 	RegraNegocio regraNegocio;
 	
@@ -36,78 +33,82 @@ public class ContaServicesImpl implements ContaServices{
 	
 	private ModelMapper mapper = new ModelMapper();
 	
-    private static final String api_cadastro = "http://localhost:8081/api/cartao/";
+    private static final String api_cadastro_cartao = "http://localhost:8084/api/cartao/";
 
+    private static final String api_cadastro_conta = "http://localhost:8084/api/conta/";
+    
 	private static final Logger log = LoggerFactory.getLogger(ContaServicesImpl.class);
 	
+	RestTemplate restTemplate = new RestTemplate(); 
+	
+	@Value("${topic.name.producer}")
+    private String topicName;
+	
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
+	
 	@Override
-	public List<ContaDTO> findAll() throws SQLException {
+	public List<ContaDTO> findAll() throws Exception {
 		log.info("Buscando todas os registros de contas.");
-		List<Conta> contas = new ArrayList<>();
 		List<ContaDTO> contasRetorno = new ArrayList<>();
 		
 		try {
-			contas = this.repository.findAll();
-			contas.stream().forEach(conta->contasRetorno.add(mapper.map(conta, ContaDTO.class)));
+			Response<ContaDTO> response = restTemplate.getForObject(api_cadastro_conta, Response.class);
 			log.info("Busca realizada com sucesso");
-			return contasRetorno;
+			return mapper.map(response.getData(), List.class);
 		}catch (Exception e) {
 			msgErro = "Erro ao buscar contas. "+e.getMessage();
 			log.info(msgErro);
-			throw new SQLException(msgErro);
+			throw new Exception(msgErro);
 		}
 	}
 
 	@Override
-	public ContaDTO findById(Integer idConta) throws SQLException {
+	public ContaDTO findById(Integer idConta) throws Exception {
 		log.info("Buscando conta.");
-		Conta conta = new Conta();
 		try {
-			conta = this.repository.findByIdConta(idConta);
-			if(conta == null) {
-				throw new NoResultException("Sem resultados.");
+			Response<ContaDTO> response = restTemplate.getForObject(api_cadastro_conta+idConta, Response.class);
+			if(response.getData() !=null) {
+				log.info("Conta encontrada.");
+				return mapper.map(response.getData(), ContaDTO.class);
 			}
-			log.info("Conta encontrado.");
-			return mapper.map(conta, ContaDTO.class);
+			throw new Exception("Erro ao procurar conta");
 		}catch (Exception e) {
 			msgErro = "Erro ao buscar conta. "+e.getMessage();
 			log.info(msgErro);
-			throw new SQLException(msgErro);
+			throw new Exception(msgErro);
 		}
 	}
 
 	@Override
-	public List<ContaDTO> save(List<ContaDTO> contasDTO) throws SQLException {
+	public List<ContaDTO> save(List<ContaDTO> contasDTO) throws Exception {
 		if(contasDTO.isEmpty()){
-			throw new NoResultException("Pesquisa em branco. ");
+			log.info("Pesquisa em branco. ");
 		}
 		log.info("Salvando conta");
-		final List<Conta> contas = new ArrayList<>();
 		List<ContaDTO>contaRetorno = new ArrayList<>();
+		RestTemplate restTemplate = new RestTemplate(); 
 		try {
 			aplicarRegra(contasDTO);
-			contasDTO.forEach(conta->contas.add(mapper.map(conta, Conta.class)));
-			this.repository.saveAll(contas).forEach(conta->contaRetorno.add(mapper.map(conta, ContaDTO.class)));
+			contasDTO.stream().forEach(cartao -> restTemplate.postForEntity(api_cadastro_conta, cartao, CartaoDTO.class));
 			return contaRetorno;
 		}catch (Exception e) {
 			msgErro = "Erro ao salvar conta. "+e.getMessage();
 			log.info(msgErro);
-			throw new SQLException(msgErro);
+			throw new Exception(msgErro);
 		}
 	}
 
 	@Override
-	public void delete(Integer idConta) throws SQLException {
-		Conta conta = new Conta();
+	public void delete(Integer idConta) throws Exception {
 		log.info("Deletando conta...");
 		
 		try{
-			conta = this.repository.findByIdConta(idConta);
-			this.repository.delete(conta);
+			 restTemplate.delete(api_cadastro_conta+idConta, Response.class);
 		}catch (Exception e) {
 			msgErro = "Erro conta não pode ser deletado. "+e.getMessage();
 			log.info(msgErro);
-			throw new SQLException(msgErro);
+			throw new Exception(msgErro);
 		}
 	}
 	  
@@ -139,9 +140,8 @@ public class ContaServicesImpl implements ContaServices{
 		}
 	}
 	private CartaoDTO buscaCartao(Integer idCartao) {
-		RestTemplate restTemplate = new RestTemplate();
 		 
-		Response<CartaoDTO> response = restTemplate.getForObject(api_cadastro+idCartao, Response.class);
+		Response<CartaoDTO> response = restTemplate.getForObject(api_cadastro_cartao+idCartao, Response.class);
 		if(response.getData() !=null) {
 			return mapper.map(response.getData(), CartaoDTO.class);
 		}
@@ -149,9 +149,11 @@ public class ContaServicesImpl implements ContaServices{
 	}
 	
 	private void atualizaCartao(List<CartaoDTO> cartoes) {
-		RestTemplate restTemplate = new RestTemplate(); 
-		cartoes.stream().forEach(cartao -> restTemplate.postForEntity(api_cadastro, cartao, CartaoDTO.class));
+		cartoes.stream().forEach(cartao -> restTemplate.postForEntity(api_cadastro_cartao, cartao, CartaoDTO.class));
+		//kafkaTemplate.send(topicName, JSONArray.toJSONString(cartoes));
+		
 	}
+	
 	
 	
 }
